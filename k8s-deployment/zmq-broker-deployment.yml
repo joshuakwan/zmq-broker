@@ -1,0 +1,45 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: zmq-broker
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zmq-broker
+    spec:
+      containers:
+      - name: zmq-broker
+        image: joshuakwan/zmq-broker:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 15554
+          name: frontend_port
+        - containerPort: 15555
+          name: backend_port
+        env:
+          - name: FRONTEND_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: zmq-broker
+                key: FRONTEND_HOST
+          - name: FRONTEND_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: zmq-broker
+                key: FRONTEND_PORT
+          - name: BACKEND_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: zmq-broker
+                key: BACKEND_HOST
+          - name: BACKEND_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: zmq-broker
+                key: BACKEND_PORT
+      imagePullSecrets:
+      - name: harbor-secret
+      restartPolicy: Always
